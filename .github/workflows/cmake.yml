@@ -31,19 +31,24 @@ jobs:
     - name: Mac deps
       if: matrix.os == 'macos-latest'
       run: brew install llvm libomp
+
     - name: Gen vcpkg
       run: ./vcpkg/bootstrap-vcpkg.sh
+
     - name: Run vcpkg
       run: ./vcpkg/vcpkg install hdf5 netcdf-c yaml-cpp zeromq
-    - name: Create Build Environment
+
+    - name: Create Build Environment unix
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake -E make_directory ${{github.workspace}}\build
-        else
-          cmake -E make_directory ${{github.workspace}}/build
-        fi
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Create Build Environment unix
+      if: matrix.os == 'windows-latest'
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{github.workspace}}\build
 
     - name: Configure CMake unix
       if: matrix.os == 'ubuntu-latest'
@@ -65,6 +70,15 @@ jobs:
       env:
         CC: /usr/local/opt/llvm/bin/clang
         CXX: /usr/local/opt/llvm/bin/clang++
+
+    - name: Debugging windows
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        pwd
+        ls
+        ls ${{github.workspace}}
+        ls ${{github.workspace}}\build
 
     - name: Configure CMake windows
       if: matrix.os == 'windows-latest'
