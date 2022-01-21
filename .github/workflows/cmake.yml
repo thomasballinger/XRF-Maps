@@ -57,7 +57,7 @@ jobs:
         fi
 
     - name: Build-unix
-      if: matrix.os == 'ubuntu-latest' || matrix.os == "macos-latest"
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
