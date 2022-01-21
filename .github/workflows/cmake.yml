@@ -30,7 +30,8 @@ jobs:
         submodules: 'recursive'
     - name: Mac deps
       if: matrix.os == 'macos-latest'
-      run: brew install llvm libomp
+      #run: brew install llvm libomp
+      run: brew install gcc
 
     - name: Gen vcpkg
       run: ./vcpkg/bootstrap-vcpkg.sh
@@ -68,8 +69,10 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
       env:
-        CC: /usr/local/opt/llvm/bin/clang
-        CXX: /usr/local/opt/llvm/bin/clang++
+        #CC: /usr/local/opt/llvm/bin/clang
+        #CXX: /usr/local/opt/llvm/bin/clang++
+        CC: /usr/local/opt/gcc@11/bin/gcc-11
+        CXX: /usr/local/opt/gcc@11/bin/g++-11
 
     - name: Debugging windows
       if: matrix.os == 'windows-latest'
@@ -103,8 +106,10 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
       env:
-        CC: /usr/local/opt/llvm/bin/clang
-        CXX: /usr/local/opt/llvm/bin/clang++
+        #CC: /usr/local/opt/llvm/bin/clang
+        #CXX: /usr/local/opt/llvm/bin/clang++
+        CC: /usr/local/opt/gcc@11/bin/gcc-11
+        CXX: /usr/local/opt/gcc@11/bin/g++-11
 
     - name: Build-windows
       if: matrix.os == 'windows-latest'
