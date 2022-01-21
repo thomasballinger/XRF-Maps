@@ -2,7 +2,12 @@ name: CMake
 
 on: [push]
 
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
 jobs:
+
   build:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
@@ -14,11 +19,6 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
-
-    env:
-      # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-      BUILD_TYPE: Release
-
 
     defaults:
       run:
@@ -60,7 +60,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ./xrf_maps --dir ${{github.workspace}}/test/2_ID_E_dataset --fit roi
 
-  - uses: actions/upload-artifact@v2
-    with:
-      name: xrf_maps
-      path: ./xrf_maps
+    - uses: actions/upload-artifact@v2
+      with:
+        name: xrf_maps
+        path: ./xrf_maps
