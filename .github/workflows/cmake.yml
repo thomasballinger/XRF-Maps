@@ -22,11 +22,9 @@ jobs:
 
     steps:
     - uses: lukka/get-cmake@latest
-
-    - name: Restore artifacts, or setup vcpkg, install packages
-        uses: lukka/run-vcpkg@v10
-        with:
-          runVcpkgInstall: true
+    - uses: lukka/run-vcpkg@v10
+      with:
+        runVcpkgInstall: true
 
     - uses: actions/checkout@v2
       with:
