@@ -41,7 +41,9 @@ jobs:
         else
           cmake -E make_directory ${{github.workspace}}/build
         fi
-    - name: Configure CMake
+
+    - name: Configure CMake unix
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       # Use a bash shell so we can use the same syntax for environment variable
       # access regardless of the host operating system
       shell: bash
@@ -49,12 +51,18 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON 
-        else
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON 
-        fi
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
+
+    - name: Configure CMake windows
+      if: matrix.os == 'windows-latest'
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{github.workspace}}\build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
 
     - name: Build-unix
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
