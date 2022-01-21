@@ -25,6 +25,7 @@ jobs:
     - uses: lukka/run-vcpkg@v10
       with:
         runVcpkgInstall: true
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
 
     - uses: actions/checkout@v2
       with:
