@@ -9,10 +9,6 @@ env:
 jobs:
 
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     strategy:
       fail-fast: false
       matrix:
@@ -41,33 +37,23 @@ jobs:
 
     - name: Create Build Environment unix
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      # Some projects don't allow in-source building, so create a separate build directory
-      # We'll use this as our working directory for all subsequent commands
       run: cmake -E make_directory build
 
     - name: Create Build Environment unix
       if: matrix.os == 'windows-latest'
-      # Some projects don't allow in-source building, so create a separate build directory
-      # We'll use this as our working directory for all subsequent commands
       run: cmake -E make_directory build
 
     - name: Configure CMake unix
       if: matrix.os == 'ubuntu-latest'
       shell: bash
       working-directory: build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
-      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake -S .. -B . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
 
     - name: Configure CMake mac
       if: matrix.os == 'macos-latest'
       shell: bash
       working-directory: build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
-      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake -S .. -B . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
       env:
         #CC: /usr/local/opt/llvm/bin/clang
         #CXX: /usr/local/opt/llvm/bin/clang++
@@ -84,14 +70,9 @@ jobs:
 
     - name: Configure CMake windows
       if: matrix.os == 'windows-latest'
-      # Use a bash shell so we can use the same syntax for environment variable
-      # access regardless of the host operating system
       shell: bash
       working-directory: build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
-      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake -S .. -B . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
 
     - name: Build-linux
       if: matrix.os == 'ubuntu-latest'
