@@ -43,31 +43,31 @@ jobs:
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
-      run: cmake -E make_directory ${{github.workspace}}/build
+      run: cmake -E make_directory build
 
     - name: Create Build Environment unix
       if: matrix.os == 'windows-latest'
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
-      run: cmake -E make_directory ${{github.workspace}}\build
+      run: cmake -E make_directory build
 
     - name: Configure CMake unix
       if: matrix.os == 'ubuntu-latest'
       shell: bash
-      working-directory: ${{github.workspace}}/build
+      working-directory: build
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
 
     - name: Configure CMake mac
       if: matrix.os == 'macos-latest'
       shell: bash
-      working-directory: ${{github.workspace}}/build
+      working-directory: build
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
       env:
         #CC: /usr/local/opt/llvm/bin/clang
         #CXX: /usr/local/opt/llvm/bin/clang++
@@ -80,29 +80,28 @@ jobs:
       run: |
         pwd
         ls
-        ls ${{github.workspace}}
-        ls ${{github.workspace}}\build
+        ls build
 
     - name: Configure CMake windows
       if: matrix.os == 'windows-latest'
       # Use a bash shell so we can use the same syntax for environment variable
       # access regardless of the host operating system
       shell: bash
-      working-directory: ${{github.workspace}}\build
+      working-directory: build
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
+      run: cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
 
     - name: Build-linux
       if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}/build
+      working-directory: build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Build-mac
       if: matrix.os == 'macos-latest'
-      working-directory: ${{github.workspace}}/build
+      working-directory: build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
       env:
@@ -113,21 +112,21 @@ jobs:
 
     - name: Build-windows
       if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}\build
+      working-directory: build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Test-unix
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      working-directory: ${{github.workspace}}/bin
+      working-directory: bin
       shell: bash
-      run: ./xrf_maps --dir ${{github.workspace}}/test/2_ID_E_dataset --fit roi
+      run: ./xrf_maps --dir ../test/2_ID_E_dataset --fit roi
 
     - name: Test-windows
       if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}\bin
+      working-directory: bin
       shell: bash
-      run: ./xrf_maps --dir ${{github.workspace}}\test\2_ID_E_dataset --fit roi
+      run: ./xrf_maps --dir ..\test\2_ID_E_dataset --fit roi
 
     - uses: actions/upload-artifact@v2
       with:
