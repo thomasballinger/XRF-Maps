@@ -61,6 +61,7 @@ jobs:
       run: ./xrf_maps --dir ${{github.workspace}}/test/2_ID_E_dataset --fit roi
 
     - uses: actions/upload-artifact@v2
+      working-directory: ${{github.workspace}}/bin
       with:
         name: xrf_maps
         path: ./xrf_maps
