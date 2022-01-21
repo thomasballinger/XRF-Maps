@@ -21,6 +21,13 @@ jobs:
         shell: bash
 
     steps:
+    - uses: lukka/get-cmake@latest
+
+    - name: Restore artifacts, or setup vcpkg, install packages
+        uses: lukka/run-vcpkg@v10
+        with:
+          runVcpkgInstall: true
+
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
@@ -31,12 +38,6 @@ jobs:
       # installing and configuring it
       if: matrix.os == 'macos-latest'
       run: brew install gcc@9 # matches default on linux
-
-    - name: Gen vcpkg
-      run: ./vcpkg/bootstrap-vcpkg.sh
-
-    - name: Run vcpkg
-      run: ./vcpkg/vcpkg install hdf5 netcdf-c yaml-cpp zeromq
 
     - name: Create Build Environment unix
       run: cmake -E make_directory build

@@ -1,0 +1,10 @@
+{
+  "name": "xrf-maps",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "hdf5",
+    "netcdf-c",
+    "yaml-cpp",
+    "zeromq"
+  ]
+}
