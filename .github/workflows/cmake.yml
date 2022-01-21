@@ -25,9 +25,11 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mac deps
+      # Use gcc instead of clang because clang doens't have 
+      # OpenMP support, and using gcc looked easier than
+      # installing and configuring it
       if: matrix.os == 'macos-latest'
-      #run: brew install llvm libomp
-      run: brew install gcc
+      run: brew install gcc@9 # matches default on linux
 
     - name: Gen vcpkg
       run: ./vcpkg/bootstrap-vcpkg.sh
@@ -36,15 +38,10 @@ jobs:
       run: ./vcpkg/vcpkg install hdf5 netcdf-c yaml-cpp zeromq
 
     - name: Create Build Environment unix
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       run: cmake -E make_directory build
 
-    - name: Create Build Environment unix
-      if: matrix.os == 'windows-latest'
-      run: cmake -E make_directory build
-
-    - name: Configure CMake unix
-      if: matrix.os == 'ubuntu-latest'
+    - name: Configure CMake
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       shell: bash
       working-directory: build
       run: cmake -S .. -B . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DBUID_WITH_ZMQ=ON
@@ -57,25 +54,11 @@ jobs:
       env:
         #CC: /usr/local/opt/llvm/bin/clang
         #CXX: /usr/local/opt/llvm/bin/clang++
-        CC: /usr/local/opt/gcc@11/bin/gcc-11
-        CXX: /usr/local/opt/gcc@11/bin/g++-11
+        CC: /usr/local/opt/gcc@9/bin/gcc-9
+        CXX: /usr/local/opt/gcc@9/bin/g++-9
 
-    - name: Debugging windows
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      run: |
-        pwd
-        ls
-        ls build
-
-    - name: Configure CMake windows
-      if: matrix.os == 'windows-latest'
-      shell: bash
-      working-directory: build
-      run: cmake -S .. -B . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DBUID_WITH_ZMQ=ON
-
-    - name: Build-linux
-      if: matrix.os == 'ubuntu-latest'
+    - name: Build
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       working-directory: build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
@@ -88,26 +71,13 @@ jobs:
       env:
         #CC: /usr/local/opt/llvm/bin/clang
         #CXX: /usr/local/opt/llvm/bin/clang++
-        CC: /usr/local/opt/gcc@11/bin/gcc-11
-        CXX: /usr/local/opt/gcc@11/bin/g++-11
+        CC: /usr/local/opt/gcc@9/bin/gcc-9
+        CXX: /usr/local/opt/gcc@9/bin/g++-9
 
-    - name: Build-windows
-      if: matrix.os == 'windows-latest'
-      working-directory: build
-      shell: bash
-      run: cmake --build . --config $BUILD_TYPE
-
-    - name: Test-unix
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+    - name: Test
       working-directory: bin
       shell: bash
       run: ./xrf_maps --dir ../test/2_ID_E_dataset --fit roi
-
-    - name: Test-windows
-      if: matrix.os == 'windows-latest'
-      working-directory: bin
-      shell: bash
-      run: ./xrf_maps --dir ..\test\2_ID_E_dataset --fit roi
 
     - uses: actions/upload-artifact@v2
       with:
